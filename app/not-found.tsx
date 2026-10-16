@@ -1,15 +1,16 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Reveal } from "@/components/reveal";
+import { Section } from "@/components/section";
 
 export default function NotFound() {
   return (
-    <Reveal className="pb-14">
-      <h1 className="text-2xl font-black">404</h1>
-      <p className="mt-2 text-lg text-muted-foreground">this page is as offline as Yata.</p>
-      <Button asChild variant="outline" className="mt-6">
-        <Link href="/">take me home</Link>
-      </Button>
-    </Reveal>
+    <Section label="404">
+      <h1 className="text-[2.25rem] leading-tight font-medium tracking-[-0.035em] [font-stretch:92%]">Nothing out here.</h1>
+      <p className="mt-3 max-w-[36rem] text-ink-2">
+        This page is as offline as Yata. The way back is the same as the way in.
+      </p>
+      <Link href="/" className="prose-link mt-6 inline-block">
+        Go to the home page
+      </Link>
+    </Section>
   );
 }

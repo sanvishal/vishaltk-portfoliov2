@@ -12,17 +12,17 @@ export function Avatar() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="a little surprise"
-      className="inline-block rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-4 focus-visible:ring-offset-background"
-      whileHover={reduce ? undefined : { rotate: -4, scale: 1.04 }}
-      whileTap={reduce ? undefined : { rotate: 6, scale: 0.94 }}
+      className="block rounded-full"
+      whileHover={reduce ? undefined : { rotate: -6, scale: 1.06 }}
+      whileTap={reduce ? undefined : { rotate: 8, scale: 0.92 }}
       transition={{ type: "spring", duration: 0.45, bounce: 0.4 }}
     >
       <img
         src="/images/tk.png"
         alt="vishal, grinning in front of some flowers"
-        width={100}
-        height={100}
-        className="size-[100px] select-none"
+        width={44}
+        height={44}
+        className="size-11 select-none"
         draggable={false}
       />
     </motion.a>

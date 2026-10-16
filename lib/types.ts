@@ -16,6 +16,8 @@ export type ProjectLink = {
 
 export type Project = {
   slug: string;
+  /** a couple of words for the index, e.g. "Markdown editor" */
+  kind: string;
   name: string;
   image: string;
   description: string;

@@ -1,43 +1,23 @@
-import type { Metadata } from "next";
-import { Bricolage_Grotesque, Geist, Geist_Mono } from "next/font/google";
-import localFont from "next/font/local";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { Backdrop } from "@/components/shell/backdrop";
+import type { Metadata, Viewport } from "next";
+import { Bricolage_Grotesque, Geist_Mono } from "next/font/google";
 import { ConsoleNote } from "@/components/shell/console-note";
-import { Footer } from "@/components/shell/footer";
-import { LookProvider } from "@/components/shell/look-provider";
-import { Nav } from "@/components/shell/nav";
-import { SocialsRail } from "@/components/shell/socials";
+import { PixelOutro } from "@/components/pixel-outro";
+import { SiteHeader } from "@/components/site-header";
 import { site } from "@/lib/data";
-import { bootScript } from "@/lib/palette";
+import { bootScript } from "@/lib/boot";
 import "./globals.css";
 
-// the typeface the site has always used. weights map to what the files actually are.
-const avenir = localFont({
-  variable: "--font-avenir",
-  display: "swap",
-  src: [
-    { path: "./fonts/AvenirLTStd-Book.woff2", weight: "300", style: "normal" },
-    { path: "./fonts/AvenirLTStd-Roman.woff2", weight: "400", style: "normal" },
-    { path: "./fonts/Avenir-Oblique.woff2", weight: "400", style: "italic" },
-    { path: "./fonts/Avenir-Medium.woff2", weight: "500", style: "normal" },
-    { path: "./fonts/Avenir-Medium.woff2", weight: "700", style: "normal" },
-    { path: "./fonts/AvenirLTStd-Black.woff2", weight: "800", style: "normal" },
-    { path: "./fonts/AvenirLTStd-Black.woff2", weight: "900", style: "normal" },
-  ],
-});
-
-const geist = Geist({ variable: "--font-geist", subsets: ["latin"], display: "swap" });
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"], display: "swap" });
 const bricolage = Bricolage_Grotesque({
   variable: "--font-bricolage",
   subsets: ["latin"],
+  axes: ["opsz", "wdth"],
   display: "swap",
 });
+const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
-  title: { default: site.name, template: `%s · ${site.name}` },
+  title: { default: `${site.name}, ${site.role.toLowerCase()}`, template: `%s · ${site.name}` },
   description: site.tagline,
   authors: [{ name: site.name }],
   openGraph: {
@@ -59,30 +39,31 @@ export const metadata: Metadata = {
   icons: { icon: "/favicon.ico" },
 };
 
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f6f6f8" },
+    { media: "(prefers-color-scheme: dark)", color: "#0e0f12" },
+  ],
+};
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${avenir.variable} ${geist.variable} ${geistMono.variable} ${bricolage.variable} h-full antialiased`}
+      className={`${bricolage.variable} ${geistMono.variable}`}
     >
       <head>
-        {/* sets data-look and --hue before first paint so nothing flashes */}
+        {/* sets the theme before first paint */}
         <script dangerouslySetInnerHTML={{ __html: bootScript }} />
       </head>
-      <body className="flex min-h-full flex-col">
-        <LookProvider>
-          <TooltipProvider delayDuration={350}>
-            <Backdrop />
-            <div className="relative mx-auto flex w-full max-w-3xl flex-1 flex-col px-4 md:px-6">
-              <SocialsRail />
-              <Nav />
-              <main className="flex-1 pt-10 md:pt-28">{children}</main>
-              <Footer />
-            </div>
-            <ConsoleNote />
-          </TooltipProvider>
-        </LookProvider>
+      <body className="min-h-dvh text-[1rem] leading-[1.6] md:text-[1.0625rem]">
+        <div className="mx-auto w-full max-w-[52rem] px-5 [--gutter:2.5rem] [--margin:8.5rem] md:px-8">
+          <SiteHeader />
+          <main>{children}</main>
+        </div>
+        <PixelOutro />
+        <ConsoleNote />
       </body>
     </html>
   );

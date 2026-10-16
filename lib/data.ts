@@ -2,7 +2,11 @@ import type { LinkType, Project, RandomProject, WorkItem } from "./types";
 
 export const site = {
   name: "Vishal TK",
-  tagline: "Developer x Designer",
+  role: "Design engineer",
+  tagline: "Design engineer. Interfaces, tools and the odd drawing made of maths.",
+  // shown in the footer as a live clock
+  timezone: "Asia/Kolkata",
+  place: "India",
   url: "https://www.vishaltk.dev",
   ogImage: "https://vishaltk.dev/images/og.jpg",
   twitterHandle: "@tk_vishal_tk",
@@ -35,6 +39,7 @@ export const iconColors: Record<LinkType, string> = {
 export const projects: Project[] = [
   {
     slug: "wrighter",
+    kind: "Markdown editor",
     name: "Wrighter",
     image: "/images/wrighter.png",
     description: "Powerful Markdown editor and writing companion",
@@ -64,6 +69,7 @@ export const projects: Project[] = [
   },
   {
     slug: "teenytools",
+    kind: "Toolbox",
     name: "TeenyTools",
     image: "/images/teenytools.png",
     description: "All in one tool for designers & developers",
@@ -102,6 +108,7 @@ export const projects: Project[] = [
   },
   {
     slug: "diddohub",
+    kind: "Hackathon winner",
     name: "DiddoHub",
     image: "/images/diddohub.png",
     description: "Open Accessible Education with Youtube",
@@ -129,6 +136,7 @@ export const projects: Project[] = [
   },
   {
     slug: "exoplanet-explore",
+    kind: "Data visualisation",
     name: "Exoplanet Explore",
     image: "/images/exoplanet.png",
     description: "Interactive Data Visualization of Exoplanets",
@@ -167,6 +175,7 @@ export const projects: Project[] = [
   },
   {
     slug: "yata",
+    kind: "Project manager",
     name: "Yata",
     image: "/images/yata.png",
     description: "Project Management App based on Hashtags",
@@ -188,6 +197,7 @@ export const projects: Project[] = [
   },
   {
     slug: "watchdog",
+    kind: "Monitoring dashboard",
     name: "WatchDog",
     image: "/images/watchdog.png",
     description: "Firefighter monitoring dashboard",
@@ -212,6 +222,7 @@ export const projects: Project[] = [
   },
   {
     slug: "old-website",
+    kind: "Portfolio, 2018",
     name: "Old Website",
     image: "/images/oldme.png",
     description: "Just the old 2018 me ✨",
