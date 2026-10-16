@@ -478,6 +478,9 @@ export const seaside: PlaceMaker = (seed, W, H, night, hour) => {
       rush = Math.max(0, rush - dt);
       clock += dt * speed;
       const lx = input.lookX;
+      // looking up or down: the shore holds still and the sky slides the other way, the nearer
+      // clouds a little more than the far ones
+      const ly = -input.lookY * 1.6;
 
       f.buf.set(sky, 0);
       for (const s of stars) {
@@ -490,7 +493,7 @@ export const seaside: PlaceMaker = (seed, W, H, night, hour) => {
           for (let x = -orbR * 3; x <= orbR * 3; x++) {
             const d = Math.hypot(x, y) / orbR;
             const px = Math.round(orb.x - lx + x);
-            const py = Math.round(orb.y + y);
+            const py = Math.round(orb.y + ly + y);
             if (py >= horizon || px < 0 || px >= W || py < 0) continue;
             if (d <= 1) f.set(px, py, c(sun.color));
             else if (d < 3 && (3 - d) / 2 + dith(px, py) * 0.6 > 0.55) {
@@ -505,12 +508,12 @@ export const seaside: PlaceMaker = (seed, W, H, night, hour) => {
           for (let x = -orbR * 4; x <= orbR * 4; x++) {
             const d = Math.hypot(x, y) / orbR;
             const px = Math.round(orb.x - lx + x);
-            const py = Math.round(orb.y + y);
+            const py = Math.round(orb.y + ly + y);
             if (d < 1 || d > 4 || px < 0 || px >= W || py < 0 || py >= horizon) continue;
             if ((4 - d) / 3 + dith(px, py) * 0.5 > 0.6) f.buf[py * W + px] = mixPacked(f.buf[py * W + px], c(0x8a98c8), 0.25);
           }
         }
-        ball(f, orb.x - lx, orb.y, orbR, [0xfbf8ea, 0xece6cc, 0xcfc8a8, 0xb0a88c]);
+        ball(f, orb.x - lx, orb.y + ly, orbR, [0xfbf8ea, 0xece6cc, 0xcfc8a8, 0xb0a88c]);
       }
       if (time.name === "night") {
         nextMeteor -= dt;
@@ -538,15 +541,15 @@ export const seaside: PlaceMaker = (seed, W, H, night, hour) => {
       }
 
       // light first, so clouds and land stand in front of it
-      if (time.sun) rays(f, orb.x - lx, orb.y, time.sun.glow, 0.3, W * 0.9);
+      if (time.sun) rays(f, orb.x - lx, orb.y + ly, time.sun.glow, 0.3, W * 0.9);
       else if (highSun) rays(f, highSun.x - lx, highSun.y, 0xfff6dc, 0.22, W * 0.8);
       for (const s of streaks) blit(f, s.s, ((s.x + clock * s.speed) % (W + s.s.w)) - s.s.w - lx * s.depth, s.y);
-      drawDrifters(f, far, clock, lx);
+      drawDrifters(f, far, clock, lx, ly);
       // big clouds stand in front of islands, but behind mountains
-      if (offshore === "mountains") drawDrifters(f, big, clock, lx);
+      if (offshore === "mountains") drawDrifters(f, big, clock, lx, ly);
       blit(f, farLayer, -MARGIN - lx * 2, 0);
-      if (offshore !== "mountains") drawDrifters(f, big, clock, lx);
-      drawDrifters(f, low, clock, lx);
+      if (offshore !== "mountains") drawDrifters(f, big, clock, lx, ly);
+      drawDrifters(f, low, clock, lx, ly * 0.5);
 
       f.buf.set(sea, horizon * W);
       // the mountains, given back by the water: darker, and broken up by the swell

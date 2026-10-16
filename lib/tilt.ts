@@ -25,8 +25,9 @@ export function startTilt() {
     if (angle === 90) [lean, tip] = [e.beta, -e.gamma];
     else if (angle === 270 || angle === -90) [lean, tip] = [-e.beta, e.gamma];
     base ??= tip;
-    // follow, very slowly, however the phone settles in the hand
-    base += (tip - base) * 0.004;
+    // follow, very slowly (over half a minute or so), however the phone settles in the hand,
+    // so a tip you hold stays held
+    base += (tip - base) * 0.0006;
     tilt.x = clamp(lean / 22);
     tilt.y = clamp((tip - base) / 18);
     tilt.active = true;

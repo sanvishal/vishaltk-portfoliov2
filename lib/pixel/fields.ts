@@ -323,7 +323,7 @@ export const fields: PlaceMaker = (seed, W, H, night, hour) => {
       const ly = input.lookY;
       for (const L of layers) {
         const ox = Math.round(-MARGIN - lx * L.depth);
-        const oy = Math.round(-ly * L.depth * 0.25);
+        const oy = Math.round(-ly * L.depth * 0.5);
         for (let y = 0; y < H; y++) {
           const syy = y - oy;
           if (syy < 0 || syy >= H) continue;
@@ -345,9 +345,10 @@ export const fields: PlaceMaker = (seed, W, H, night, hour) => {
         const postDark = c(tone(0x5e4632));
         const wire = c(tone(0x6a5a4a));
         const ox = -lx * 16;
+        const fy = Math.round(-ly * 7);
         for (let i = 0; i < posts.length; i++) {
           const x = Math.round(posts[i] + ox);
-          for (let y = Math.round(fenceY - 13); y < fenceY; y++) {
+          for (let y = Math.round(fenceY - 13) + fy; y < fenceY + fy; y++) {
             f.set(x, y, post);
             f.set(x + 1, y, postDark);
           }
@@ -356,15 +357,15 @@ export const fields: PlaceMaker = (seed, W, H, night, hour) => {
             for (const hy of [9, 4]) {
               for (let xx = x + 2; xx < x2; xx++) {
                 const u = (xx - x) / (x2 - x);
-                f.set(xx, fenceY - hy + Math.sin(u * Math.PI) * 1.5, wire);
+                f.set(xx, fenceY - hy + fy + Math.sin(u * Math.PI) * 1.5, wire);
               }
             }
           }
         }
       }
       for (const r of rocks) {
-        ball(f, r.x - lx * 16, r.y, r.r, [0xc8c4bc, 0xa8a49c, 0x86827a, 0x66625c].map(tone));
-        ball(f, r.x - lx * 16 - r.r * 0.3, r.y - r.r * 0.5, r.r * 0.4, [0x9ac06a, 0x7aa04a, 0x5a8040].map(tone));
+        ball(f, r.x - lx * 16, r.y - ly * 7, r.r, [0xc8c4bc, 0xa8a49c, 0x86827a, 0x66625c].map(tone));
+        ball(f, r.x - lx * 16 - r.r * 0.3, r.y - ly * 7 - r.r * 0.5, r.r * 0.4, [0x9ac06a, 0x7aa04a, 0x5a8040].map(tone));
       }
 
       // the meadow: every blade and stem bends from its root, more toward the tip, as the
@@ -374,15 +375,18 @@ export const fields: PlaceMaker = (seed, W, H, night, hour) => {
         const flutter = Math.sin(clock * (p.kind === "blade" ? 5 : 3.2) + p.p) * 0.18;
         const bend = ((w + flutter) * p.h * 0.55) / p.stiff;
         // nearer plants (lower on screen) slide further than the ones at the back of the meadow
-        const bx = p.x - lx * (10 + ((p.y - horizon) / (H - horizon)) * 8);
+        const near = (p.y - horizon) / (H - horizon);
+        const bx = p.x - lx * (10 + near * 8);
+        // and rise or sink as you look down or up, the nearest most
+        const by = p.y - ly * (5 + near * 5);
         let tx = bx;
-        let ty = p.y;
+        let ty = by;
         const stem = p.kind === "blade" ? (Math.abs(bend) > p.h * 0.32 ? bladeLit : bladeCols[p.shade]) : stemCols[p.shade];
         const steps = Math.ceil(p.h);
         for (let k = 1; k <= steps; k++) {
           const t = k / steps;
           tx = bx + bend * t * t;
-          ty = p.y - p.h * t * (1 - 0.18 * Math.min(1, Math.abs(bend) / p.h));
+          ty = by - p.h * t * (1 - 0.18 * Math.min(1, Math.abs(bend) / p.h));
           f.set(tx, ty, stem);
         }
         if (p.kind !== "blade") drawBloom(f, p.kind, tx, ty - 1, p.size, bend);

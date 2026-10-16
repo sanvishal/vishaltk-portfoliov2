@@ -127,10 +127,10 @@ export function cumulus(rand: () => number, w: number, h: number, palette: numbe
 /** a cloud drifting across the frame, wrapping around once it's fully off one side */
 export type Drifter = { s: Sprite; x: number; y: number; speed: number; depth: number };
 
-export function drawDrifters(f: Frame, list: Drifter[], t: number, look: number) {
+export function drawDrifters(f: Frame, list: Drifter[], t: number, look: number, lookY = 0) {
   for (const d of list) {
     const span = f.W + d.s.w;
     const x = ((((d.x + t * d.speed) % span) + span) % span) - d.s.w;
-    blit(f, d.s, x - look * d.depth, d.y);
+    blit(f, d.s, x - look * d.depth, d.y + lookY * d.depth);
   }
 }
