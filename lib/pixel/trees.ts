@@ -147,8 +147,31 @@ export function makeTree(
   return { body, ax, ay, clumps, top: CY - RY };
 }
 
-/** draws a tree with its foot at (x, y), its clumps where their springs have them */
-export function drawTree(f: Frame, tree: Tree, x: number, y: number) {
-  blit(f, tree.body, x - tree.ax, y - tree.ay);
-  for (const cl of tree.clumps) blit(f, cl.s, x + cl.x + cl.ox - cl.s.w / 2, y + cl.y + cl.oy - cl.s.h / 2);
+/**
+ * draws a tree with its foot at (x, y). `bend` is how far the wind pushes the top of the
+ * crown sideways: the trunk stays planted and leans more the higher up it goes, so the whole
+ * tree bows as one. `flutter` is the quick, small shiver of the leaves on top of that, each
+ * clump on its own beat; their springs (the pointer's doing) add on as well.
+ */
+export function drawTree(f: Frame, tree: Tree, x: number, y: number, bend = 0, flutter = 0, clock = 0) {
+  const height = Math.max(1, -tree.top);
+  const lean = (up: number) => bend * Math.max(0, up / height) ** 2;
+  // the body, row by row, each row shifted by how high it stands
+  const b = tree.body;
+  const x0 = x - tree.ax;
+  const y0 = y - tree.ay;
+  for (let row = 0; row < b.h; row++) {
+    const fy = Math.round(y0 + row);
+    if (fy < 0 || fy >= f.H) continue;
+    const dx = Math.round(x0 + lean(tree.ay - row));
+    for (let col = 0; col < b.w; col++) {
+      const v = b.px[row * b.w + col];
+      const fx = dx + col;
+      if (v && fx >= 0 && fx < f.W) f.buf[fy * f.W + fx] = v;
+    }
+  }
+  for (const cl of tree.clumps) {
+    const shiver = Math.sin(clock * (7 + (cl.seed % 5)) + cl.seed) * flutter;
+    blit(f, cl.s, x + cl.x + cl.ox + lean(-cl.y) + shiver - cl.s.w / 2, y + cl.y + cl.oy + Math.abs(shiver) * 0.3 - cl.s.h / 2);
+  }
 }

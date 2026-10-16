@@ -223,7 +223,11 @@ export function outro(seed: number, W: number, H: number, night: boolean) {
       clock += dt;
       if (input.clicks.length) gust = 1;
       gust = Math.max(0, gust - dt * 0.6);
-      const wind = Math.sin(clock * 0.7) * 0.6 + Math.sin(clock * 1.9) * 0.25 + gust * 3;
+      // wind as a travelling wave: gusts roll across the scene from one side, so they reach the
+      // grass in one place and the tree a moment later, rather than everything swaying at once
+      const breeze = 0.35 + Math.sin(clock * 0.23) * 0.25;
+      const gustAt = (x: number) => Math.max(0, noise(x * 0.018 - clock * 0.55, 3, clock * 0.07, 2) * 2.2 + 0.1);
+      const windAt = (x: number) => breeze + gustAt(x) * 2.2 + gust * 3;
       const { buf } = f;
       buf.set(base);
       for (const st of stars) if (Math.sin(clock * 1.3 + st.p) > -0.2) buf[st.i] = c(0xdfe6ff);
@@ -271,9 +275,10 @@ export function outro(seed: number, W: number, H: number, night: boolean) {
             if (q > 0) buf[y * W + x] = mixPacked(buf[y * W + x], c(0xffd890), q);
           }
       }
-      // the crown's clumps sit on springs: the wind sways them, the pointer ruffles them
+      // the crown's clumps sit on springs the pointer can ruffle; the wind itself bends the
+      // whole tree (below), so the springs only take a little of it
       for (const cl of tree.clumps) {
-        const sway = wind * 0.8 + Math.sin(clock * 1.3 + cl.seed) * 0.3;
+        const sway = Math.sin(clock * 1.3 + cl.seed) * 0.25;
         if (input.x !== null && input.y !== null) {
           const d = Math.hypot(input.x - (tx + cl.x + cl.ox), input.y - (ground + cl.y + cl.oy));
           if (d < cl.r + 4) {
@@ -289,12 +294,17 @@ export function outro(seed: number, W: number, H: number, night: boolean) {
         cl.ox = Math.max(-3, Math.min(3, cl.ox + cl.vx * dt));
         cl.oy = Math.max(-2, Math.min(2, cl.oy + cl.vy * dt));
       }
-      drawTree(f, tree, tx, ground);
+      // the tree bows with the gust passing over it, and its leaves shiver while it does
+      const atTree = windAt(tx);
+      drawTree(f, tree, tx, ground, Math.min(4, atTree * 1.1) * s, Math.min(1, gustAt(tx) * 0.9 + gust), clock);
 
       // grass: swaying, flowers on some, leaning out of the pointer's way
       const near = input.x !== null && input.y !== null && input.y > ground - 22 * s;
       for (const b of blades) {
-        let target = wind * 0.6 + Math.sin(clock * 2 + b.x * 0.15 + b.p) * 0.5;
+        // each blade leans with the wind where it stands, and its tip flutters faster when a
+        // gust is passing through it
+        const here = windAt(b.x);
+        let target = here * 0.9 + Math.sin(clock * (5 + here * 3) + b.p) * (0.15 + gustAt(b.x) * 0.35);
         if (near) {
           const d = b.x - input.x!;
           if (Math.abs(d) < 14 * s) target += Math.sign(d || 1) * (1 - Math.abs(d) / (14 * s)) * 4 * s;
@@ -311,7 +321,7 @@ export function outro(seed: number, W: number, H: number, night: boolean) {
       for (let i = petals.length - 1; i >= 0; i--) {
         const p = petals[i];
         p.age += dt;
-        p.vx += (wind * 6 - p.vx) * dt;
+        p.vx += (windAt(p.x) * 6 - p.vx) * dt;
         p.vy = Math.min(10, p.vy + dt * 12);
         p.x += (p.vx + Math.sin(p.age * 5) * 4) * dt;
         p.y += p.vy * dt;
@@ -457,7 +467,7 @@ export function outro(seed: number, W: number, H: number, night: boolean) {
         f.set(b.x + 1, b.y, c(0x2a2420));
       }
       for (const fl of fluff) {
-        fl.x += (wind * 10 + 2 + Math.sin(clock + fl.p) * 3) * dt;
+        fl.x += (windAt(fl.x) * 10 + 2 + Math.sin(clock + fl.p) * 3) * dt;
         fl.y += Math.sin(clock * 0.8 + fl.p) * 3 * dt - dt * 0.6;
         if (fl.x > W + 4) fl.x = -4;
         if (fl.x < -4) fl.x = W + 4;

@@ -134,7 +134,7 @@ function scatter(buf: Uint32Array, src: Uint32Array, d: ReturnType<typeof makeDu
     // how far through its flight this pixel is (settling, how far it still has to go)
     const s = (settling ? d.rel[i] - age : age - d.rel[i]) / d.life[i];
     if (s <= 0) {
-      if (!settling) buf[i] = col;
+      buf[i] = col;
       continue;
     }
     if (s >= 1 || !d.fly[i]) continue;
@@ -187,6 +187,12 @@ function MouseButton({ side }: { side: "left" | "right" }) {
 export function PixelPlace() {
   const { theme } = usePageState();
   const reduce = useReducedMotion();
+  // read inside the loop rather than rebuilding the place when the setting comes in: it starts
+  // out unknown and settles a moment later, and a rebuild would blank the picture
+  const reduceRef = useRef(false);
+  useEffect(() => {
+    reduceRef.current = !!reduce;
+  }, [reduce]);
   const placeSeed = useSyncExternalStore(placeStore.subscribe, placeStore.get, () => null);
   const busy = useSyncExternalStore(placeStore.subscribe, placeStore.busy, () => false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -292,15 +298,15 @@ export function PixelPlace() {
     let born = prev;
 
     const tick = (now: number) => {
-      const dt = reduce ? 0 : Math.min((now - prev) / 1000, 0.05);
+      const dt = reduceRef.current ? 0 : Math.min((now - prev) / 1000, 0.05);
       prev = now;
       look.x += (look.tx - look.x) * Math.min(1, dt * 4);
       look.y += (look.ty - look.y) * Math.min(1, dt * 4);
       // a place that trips over itself keeps its last good frame, and the loop goes on
       try {
         current.draw(frame, (now - born) / 1000, dt, {
-          lookX: reduce ? 0 : look.x,
-          lookY: reduce ? 0 : look.y,
+          lookX: reduceRef.current ? 0 : look.x,
+          lookY: reduceRef.current ? 0 : look.y,
           clicks: clicks.splice(0),
         });
       } catch (err) {
@@ -327,14 +333,17 @@ export function PixelPlace() {
       }
 
       const age = (now - born) / 1000;
-      moving = !reduce && age < SCATTER;
+      // arriving from nothing (a first visit) is quick, so the picture is there almost at once;
+      // giving way from one place to another takes its time
+      const quick = !from;
+      moving = !reduceRef.current && age < (quick ? SCATTER / 3.2 : SCATTER);
       if (moving) {
         if (from && from.length !== frame.buf.length) from = null;
         if (from && old) {
           try {
             old.place.draw(old.frame, (now - old.born) / 1000, dt, {
-              lookX: reduce ? 0 : look.x,
-              lookY: reduce ? 0 : look.y,
+              lookX: reduceRef.current ? 0 : look.x,
+              lookY: reduceRef.current ? 0 : look.y,
               clicks: [],
             });
             bloom(old.frame, old.place.bloom ?? 0.5);
@@ -349,7 +358,7 @@ export function PixelPlace() {
         else {
           const fresh = frame.buf.slice();
           frame.buf.fill(0);
-          scatter(frame.buf, fresh, dust, frame.W, frame.H, age, true);
+          scatter(frame.buf, fresh, dust, frame.W, frame.H, age * 3.2 + 0.3, true);
         }
       } else {
         from = null;
@@ -357,7 +366,7 @@ export function PixelPlace() {
         dust = null;
       }
       shown.set(frame.buf);
-      applyEdge(frame.buf, edge, reduce ? 0 : now / 1000);
+      applyEdge(frame.buf, edge, reduceRef.current ? 0 : now / 1000);
       ctx.putImageData(image, 0, 0);
       painted = true;
       raf = visible ? requestAnimationFrame(tick) : 0;
@@ -368,7 +377,8 @@ export function PixelPlace() {
         raf = requestAnimationFrame(tick);
       }
     };
-    kick();
+    // the first frame goes up straight away, so the canvas is never left empty
+    tick(performance.now());
 
     const ro = new ResizeObserver(() => {
       build();
@@ -400,7 +410,7 @@ export function PixelPlace() {
       canvas.removeEventListener("pointerdown", onDown);
       canvas.removeEventListener("contextmenu", onMenu);
     };
-  }, [theme, placeSeed, reduce]);
+  }, [theme, placeSeed]);
 
   // the number is the place: clicking it copies a link straight back to it
   const [copied, setCopied] = useState(false);
@@ -416,9 +426,10 @@ export function PixelPlace() {
   };
 
   return (
-    <figure className="relative">
+    <figure className="relative @container">
       {placeSeed !== null && nodFor(placeSeed) ? <Nod key={placeSeed} title={nodFor(placeSeed)!} still={!!reduce} /> : null}
-      <div ref={boxRef} className="flex w-full justify-center">
+      {/* the canvas's own height, reserved before it draws: 0.9 of its width when narrow, 9/16 when wide */}
+      <div ref={boxRef} className="flex aspect-[10/9] w-full items-start justify-center @min-[640px]:aspect-[16/9]">
         <canvas
           ref={canvasRef}
           role="img"
