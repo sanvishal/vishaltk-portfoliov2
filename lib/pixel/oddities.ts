@@ -8,7 +8,7 @@ import { makeNoise3 } from "./world";
  */
 export function oddity(seed: number): "bagel" | "gargantua" | null {
   const r = mulberry32(seed * 131 + 7)();
-  return r < 0.05 ? "bagel" : r < 0.3 ? "gargantua" : null;
+  return r < 0.05 ? "bagel" : r < 0.35 ? "gargantua" : null;
 }
 
 const rotX = (v: number[], a: number) => [v[0], v[1] * Math.cos(a) - v[2] * Math.sin(a), v[1] * Math.sin(a) + v[2] * Math.cos(a)];
