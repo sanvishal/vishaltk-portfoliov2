@@ -5,6 +5,7 @@ import { useReducedMotion } from "motion/react";
 import { Frame } from "@/lib/pixel/frame";
 import { outro, type OutroInput } from "@/lib/pixel/outro";
 import { usePageState } from "@/lib/state";
+import { startTilt, tilt } from "@/lib/tilt";
 
 /**
  * a little countryside at the very end of the page, made fresh on every visit. it's drawn in
@@ -44,7 +45,8 @@ export function PixelOutro() {
     build();
 
     // the pointer, in the scene's own pixels, and how fast it's going
-    const input: OutroInput = { x: null, y: null, vx: 0, vy: 0, clicks: [] };
+    const input: OutroInput = { x: null, y: null, vx: 0, vy: 0, clicks: [], tilt: 0 };
+    startTilt();
     let last = { x: 0, y: 0, t: 0 };
     const onMove = (e: PointerEvent) => {
       const r = canvas.getBoundingClientRect();
@@ -83,6 +85,7 @@ export function PixelOutro() {
     const tick = (now: number) => {
       const dt = reduce ? 0 : Math.min((now - prev) / 1000, 0.05);
       prev = now;
+      input.tilt = tilt.active ? tilt.x : 0;
       scene.draw(frame, dt, input);
       input.clicks.length = 0;
       input.vx *= 0.85;

@@ -5,7 +5,15 @@ import { pickTime } from "./time";
 import { makeNoise3 } from "./world";
 
 /** where the pointer is over the scene, in its pixels, and how fast it's moving; null when away */
-export type OutroInput = { x: number | null; y: number | null; vx: number; vy: number; clicks: { x: number; y: number }[] };
+export type OutroInput = {
+  x: number | null;
+  y: number | null;
+  vx: number;
+  vy: number;
+  clicks: { x: number; y: number }[];
+  /** on a phone, how far it's leaned left or right; the wind blows that way */
+  tilt?: number;
+};
 
 type Perch = { x: number; y: number };
 type Bird = { x: number; y: number; vx: number; vy: number; state: "perched" | "flying" | "landing" | "gone"; perch: number; p: number; wait: number; look: number };
@@ -227,7 +235,8 @@ export function outro(seed: number, W: number, H: number, night: boolean) {
       // grass in one place and the tree a moment later, rather than everything swaying at once
       const breeze = 0.35 + Math.sin(clock * 0.23) * 0.25;
       const gustAt = (x: number) => Math.max(0, noise(x * 0.018 - clock * 0.55, 3, clock * 0.07, 2) * 2.2 + 0.1);
-      const windAt = (x: number) => breeze + gustAt(x) * 2.2 + gust * 3;
+      const lean = input.tilt ?? 0;
+      const windAt = (x: number) => breeze + gustAt(x) * 2.2 + gust * 3 + lean * 2.5;
       const { buf } = f;
       buf.set(base);
       for (const st of stars) if (Math.sin(clock * 1.3 + st.p) > -0.2) buf[st.i] = c(0xdfe6ff);

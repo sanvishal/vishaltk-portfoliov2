@@ -8,6 +8,7 @@ import { makeNoise3 } from "@/lib/pixel/world";
 import { SEED_MAX, clickFor, firstSeed, nextSeed, nodFor, placeFor, sameKindSeed } from "@/lib/pixel/places";
 import type { Input, Place } from "@/lib/pixel/scene";
 import { usePageState } from "@/lib/state";
+import { startTilt, tilt } from "@/lib/tilt";
 
 // which place is showing. picked on the client (or from ?place=), so the server renders none.
 // a fresh visit always opens on the flower fields.
@@ -261,7 +262,10 @@ export function PixelPlace() {
     // where the pointer is, relative to the picture, eased so looking around feels weighty
     const look = { x: 0, y: 0, tx: 0, ty: 0 };
     const clicks: Input["clicks"] = [];
+    // on a phone, how it's tilted stands in for the pointer
+    startTilt();
     const onMove = (e: PointerEvent) => {
+      if (tilt.active) return;
       const r = canvas.getBoundingClientRect();
       look.tx = Math.max(-1.5, Math.min(1.5, (e.clientX - (r.left + r.width / 2)) / (r.width / 2)));
       look.ty = Math.max(-1.5, Math.min(1.5, (e.clientY - (r.top + r.height / 2)) / (r.height / 2)));
@@ -300,6 +304,10 @@ export function PixelPlace() {
     const tick = (now: number) => {
       const dt = reduceRef.current ? 0 : Math.min((now - prev) / 1000, 0.05);
       prev = now;
+      if (tilt.active) {
+        look.tx = tilt.x;
+        look.ty = tilt.y;
+      }
       look.x += (look.tx - look.x) * Math.min(1, dt * 4);
       look.y += (look.ty - look.y) * Math.min(1, dt * 4);
       // a place that trips over itself keeps its last good frame, and the loop goes on
