@@ -1,8 +1,10 @@
+import { Brand } from "@/components/brand";
 import { Experience } from "@/components/experience";
 import { PageSlide } from "@/components/page-slide";
 import { Playground } from "@/components/playground";
 import { PixelPlace } from "@/components/pixel-place";
 import { Section } from "@/components/section";
+import { Verse } from "@/components/verse";
 import { WorkIndex } from "@/components/work-index";
 import { projects, randomProjects, site, socials, work } from "@/lib/data";
 
@@ -26,21 +28,11 @@ export default function Home() {
           <Section label="About">
             <div className="max-w-[36rem] space-y-5 text-pretty md:text-[1.125rem] md:leading-[1.6]">
               <p>
-                I&rsquo;m a design engineer. I work in the gap between the mockup and the shipped thing,
-                and I care most about what usually gets lost on the way: how a menu eases open, the
-                colour that&rsquo;s almost right, an editor that stays out of your way.
+                I&rsquo;m a <Verse>design engineer</Verse> at <Brand name="pushowl" />, working on{" "}
+                <Brand name="shopify" /> apps used by millions of people. I design what I build, and most
+                of my time goes into how it moves and feels.
               </p>
-              <p>
-                These days I&rsquo;m at <Ext href="https://pushowl.com/">PushOwl</Ext>, working on
-                Shopify apps whose frontends serve millions of people. Before that I spent a few
-                years at Presidio on data-heavy dashboards, a design system, and more AWS than I&rsquo;d
-                like to admit.
-              </p>
-              <p>
-                I learned to code by making games, so the top of this page is a small one: a place
-                drawn from a single number, different on every visit. A beach, a rainy street, a
-                pond, a train over flooded fields, a planet. Poke at it.
-              </p>
+              <p>Outside work I make and play games, and obsess over movies.</p>
             </div>
           </Section>
         </div>

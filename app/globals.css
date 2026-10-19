@@ -112,6 +112,241 @@
   text-decoration-color: var(--accent-ink);
 }
 
+/* ---------- spider-verse glitch on a few words ----------
+   at rest it's just the words, a touch heavier. during a burst components/verse.tsx gives each
+   letter a look per frame (data-s) plus its own colours, offsets, angle and typeface as custom
+   properties; these rules draw the looks. no transitions anywhere: every change is a hard cut. */
+.verse {
+  --verse-blend: multiply;
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+  font-weight: 600;
+  isolation: isolate;
+}
+[data-theme="dark"] .verse {
+  --verse-blend: screen;
+}
+/* the letter as it sits in the line. during a glitch its glyph only goes invisible, so the
+   line never moves; everything else is drawn in .vl-fx, laid over it and out of the flow. */
+.vl {
+  position: relative;
+  display: inline-block;
+}
+.vl[data-s] {
+  z-index: 1;
+}
+.vl[data-s] .vl-rest {
+  color: transparent;
+}
+.vl-fx {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  user-select: none;
+  transform: translate(var(--x), var(--y)) rotate(var(--r)) skewX(var(--k));
+}
+.vl[data-s] .vl-fx {
+  display: flex;
+}
+/* the warp, treatment, face and size of a frame are set on this one */
+.vl-mod {
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+  line-height: 1.15;
+}
+.vl-ink {
+  position: relative;
+  display: inline-block;
+}
+.vl-a,
+.vl-b,
+.vl-box {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  opacity: 0;
+}
+.vl-box {
+  z-index: -1;
+  inset: 0.04em -0.06em 0;
+}
+.vl[data-s] .vl-a,
+.vl[data-s] .vl-b {
+  mix-blend-mode: var(--verse-blend);
+}
+
+/* plates out of register */
+.vl[data-s="split"] .vl-a {
+  opacity: 1;
+  color: var(--c1);
+  transform: translateX(calc(var(--d) * -1));
+}
+.vl[data-s="split"] .vl-b {
+  opacity: 1;
+  color: var(--c2);
+  transform: translateX(var(--d));
+}
+
+/* halftone dot matrix, two screens of dots a little apart */
+.vl[data-s="dots"] .vl-ink,
+.vl[data-s="dots"] .vl-b,
+.vl[data-s="ghost"] .vl-b {
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.vl[data-s="dots"] .vl-ink {
+  background-image: radial-gradient(circle, var(--c1) 0 45%, transparent 50%);
+  background-size: var(--dot) var(--dot);
+}
+.vl[data-s="dots"] .vl-b {
+  opacity: 1;
+  background-image: radial-gradient(circle, var(--c2) 0 40%, transparent 46%);
+  background-size: calc(var(--dot) * 0.8) calc(var(--dot) * 0.8);
+  transform: translate(var(--d), calc(var(--d) * 0.4));
+}
+
+/* a solid fill with coloured fringes either side */
+.vl[data-s="solid"] .vl-ink {
+  color: var(--c1);
+  text-shadow:
+    var(--d) 0 0 var(--c2),
+    calc(var(--d) * -1) 0 0 var(--c3);
+}
+
+/* torn in two along a line, the halves sliding apart */
+.vl[data-s="tear"] .vl-ink {
+  opacity: 0;
+}
+.vl[data-s="tear"] .vl-a {
+  opacity: 1;
+  color: var(--c1);
+  clip-path: inset(0 0 calc(100% - var(--cut)) 0);
+  transform: translateX(calc(var(--d) * 2));
+}
+.vl[data-s="tear"] .vl-b {
+  opacity: 1;
+  color: var(--ink);
+  mix-blend-mode: normal;
+  clip-path: inset(var(--cut) 0 0 0);
+  transform: translateX(calc(var(--d) * -1.6));
+}
+
+/* just a glowing outline, with a second one off to the side */
+.vl[data-s="outline"] .vl-ink {
+  color: transparent;
+  -webkit-text-stroke: 0.035em var(--c1);
+  text-shadow: 0 0 0.25em var(--c1);
+}
+.vl[data-s="outline"] .vl-a {
+  opacity: 0.8;
+  color: transparent;
+  -webkit-text-stroke: 0.025em var(--c2);
+  transform: translate(var(--d), calc(var(--d) * -0.5));
+}
+
+/* scanlines, the two plates on alternate lines */
+.vl[data-s="scan"] .vl-ink {
+  color: var(--c1);
+  -webkit-mask-image: repeating-linear-gradient(#000 0 0.06em, transparent 0.06em 0.12em);
+  mask-image: repeating-linear-gradient(#000 0 0.06em, transparent 0.06em 0.12em);
+}
+.vl[data-s="scan"] .vl-a {
+  opacity: 1;
+  color: var(--c2);
+  -webkit-mask-image: repeating-linear-gradient(transparent 0 0.06em, #000 0.06em 0.12em);
+  mask-image: repeating-linear-gradient(transparent 0 0.06em, #000 0.06em 0.12em);
+  transform: translateX(var(--d));
+}
+
+/* on a caption box of halftone */
+.vl[data-s="box"] .vl-box {
+  opacity: 1;
+  background:
+    radial-gradient(circle, color-mix(in oklab, #000 22%, transparent) 0 28%, transparent 32%) 0 0 / 0.2em 0.2em,
+    var(--c1);
+  transform: skewX(-8deg) rotate(calc(var(--r) * -0.6));
+}
+.vl[data-s="box"] .vl-ink {
+  color: var(--on);
+}
+.vl[data-s="box"] .vl-a {
+  opacity: 0.9;
+  color: var(--c2);
+  transform: translate(var(--d), calc(var(--d) * 0.5));
+}
+
+/* knocked out of a solid block of ink */
+.vl[data-s="knock"] .vl-box {
+  opacity: 1;
+  background: var(--ink);
+  transform: rotate(calc(var(--r) * -0.4));
+}
+.vl[data-s="knock"] .vl-ink {
+  color: var(--paper);
+}
+.vl[data-s="knock"] .vl-a {
+  opacity: 1;
+  color: var(--c1);
+  transform: translateX(var(--d));
+}
+
+/* barely there: a faint letter and a scatter of dots */
+.vl[data-s="ghost"] .vl-ink {
+  opacity: 0.14;
+}
+.vl[data-s="ghost"] .vl-b {
+  opacity: 0.85;
+  background-image: radial-gradient(circle, var(--c1) 0 38%, transparent 44%);
+  background-size: var(--dot) var(--dot);
+  transform: translateX(var(--d));
+}
+
+/* a gradient fill through three of the inks */
+.vl[data-s="gradient"] .vl-ink {
+  color: transparent;
+  background: linear-gradient(var(--ang), var(--c1), var(--c2) 50%, var(--c3));
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+.vl[data-s="gradient"] .vl-a {
+  opacity: 0.7;
+  color: var(--c3);
+  transform: translateX(var(--d));
+}
+
+/* diagonal stripes */
+.vl[data-s="stripes"] .vl-ink {
+  color: transparent;
+  background: repeating-linear-gradient(var(--ang), var(--c1) 0 0.06em, var(--c2) 0.06em 0.12em);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* an inked comic letter: white, heavy black outline, a hard shadow in colour */
+.vl[data-s="comic"] .vl-ink {
+  color: #fff;
+  -webkit-text-stroke: 0.07em #111;
+  paint-order: stroke fill;
+  text-shadow: 0.06em 0.06em 0 var(--c1);
+}
+
+/* neon: a hot core in a wide glow */
+.vl[data-s="neon"] .vl-ink {
+  color: color-mix(in oklab, var(--c1) 35%, #fff);
+  text-shadow:
+    0 0 0.05em #fff,
+    0 0 0.15em var(--c1),
+    0 0 0.4em var(--c1),
+    0 0 0.8em var(--c2);
+}
+
 /* small interface text: nav, dates, captions, buttons */
 .ui {
   font-family: var(--font-sans);

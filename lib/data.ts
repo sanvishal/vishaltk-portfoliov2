@@ -42,7 +42,7 @@ export const projects: Project[] = [
     kind: "Markdown editor",
     name: "Wrighter",
     image: "/images/wrighter.png",
-    description: "Powerful Markdown editor and writing companion",
+    description: "A markdown editor that keeps loose thoughts as bites",
     accentColor: "#4242ff",
     about: [
       'wrighter is a modern WYSIWYM #tag based markdown editor on the web. wrighter\'s "bites" help you manage unorganised thoughts which you can later use while writing, you can use wrighter to even publish your blogs or use it just as an editor without signing up!',
@@ -72,7 +72,7 @@ export const projects: Project[] = [
     kind: "Toolbox",
     name: "TeenyTools",
     image: "/images/teenytools.png",
-    description: "All in one tool for designers & developers",
+    description: "The small tools designers who code use daily, in one tab",
     accentColor: "#E27055",
     about: [
       "A quick, all-in-one toolbox of small tools for designers and designers who code. teenytools has many frequently used tools by developers every day, it provides both the ease of access on commonly used tools and a depth of customizations on those tools too.",
@@ -111,7 +111,7 @@ export const projects: Project[] = [
     kind: "Hackathon winner",
     name: "DiddoHub",
     image: "/images/diddohub.png",
-    description: "Open Accessible Education with Youtube",
+    description: "Learning paths made from YouTube videos",
     accentColor: "#226FEE",
     about: [
       'Usually, whenever I get an idea with a broad scope, the first thing I do is sit on it for a couple of weeks(procrastination is a good thing sometimes :P). I get started on the design, colors, typography, and the UI first before getting into the "gotchas" of actually executing the idea and making it so that I can be as creative as I want with the design decisions. One such idea is diddohub.',
@@ -139,7 +139,7 @@ export const projects: Project[] = [
     kind: "Data visualisation",
     name: "Exoplanet Explore",
     image: "/images/exoplanet.png",
-    description: "Interactive Data Visualization of Exoplanets",
+    description: "Kepler and NASA data as a star map you can explore",
     accentColor: "#de2f53",
     links: [
       {
@@ -178,7 +178,7 @@ export const projects: Project[] = [
     kind: "Project manager",
     name: "Yata",
     image: "/images/yata.png",
-    description: "Project Management App based on Hashtags",
+    description: "A project manager that sorts work by hashtag",
     accentColor: "#fd554f",
     links: [
       { type: "website", name: "Visit Yata", href: "https://yataapp.vercel.app/" },
@@ -200,7 +200,7 @@ export const projects: Project[] = [
     kind: "Monitoring dashboard",
     name: "WatchDog",
     image: "/images/watchdog.png",
-    description: "Firefighter monitoring dashboard",
+    description: "A monitoring dashboard for firefighters",
     accentColor: "#FA9E7A",
     links: [
       { type: "website", name: "Visit WatchDog", href: "https://watchdogapp.vercel.app/" },
@@ -225,7 +225,7 @@ export const projects: Project[] = [
     kind: "Portfolio, 2018",
     name: "Old Website",
     image: "/images/oldme.png",
-    description: "Just the old 2018 me ✨",
+    description: "The 2018 me, kept as it was",
     accentColor: "#fd4445",
     links: [
       { type: "website", name: "Visit Old Website", href: "https://tkvishalold.vercel.app/" },
@@ -242,39 +242,49 @@ export const projects: Project[] = [
 
 export const randomProjects: RandomProject[] = [
   {
+    name: "Overgrown",
+    description: "An app nobody opens any more, with the moss taking it back.",
+    about: "Rust, grime, moss and ivy, grown over a real interface.",
+    link: "/lab/overgrown",
+  },
+  {
+    name: "Grass",
+    description: "Pixel grass that grows in over bare earth and bends in the wind.",
+    about: "Click it to plant flowers.",
+    link: "/lab/grass",
+  },
+  {
     name: "Curse of the Ego King",
-    description: "a fast-paced action game about a king with big ego",
-    about: 'this game won the "most creative" award in repl.it kaboom game jam 2021',
+    description: "A fast action game about a king with a very big ego.",
+    about: "Won “most creative” at the Replit Kaboom game jam, 2021.",
     image: "/images/randoms/ego.png",
     link: "https://replit.com/@vishal1999tk/Curse-of-the-Ego-King?v=1",
   },
   {
-    name: "itch.io Profile",
-    description: "all my other games made before 2018",
-    about:
-      "fun fact: I learnt programming and design through making games for fun, unintentionally :P",
+    name: "Games on itch.io",
+    description: "Every game I made before 2018.",
+    about: "Making these is how I learned to program and design, without meaning to.",
     image: "/images/randoms/itch.jpg",
     link: "https://tkgames.itch.io",
   },
   {
-    name: "diddohub(beta)",
-    description: "notion-like text editor that syncs with youtube video",
-    about: "an improved version of this POC won the company internal hackathon!",
+    name: "DiddoHub beta",
+    description: "A notes editor that stays in sync with a YouTube video.",
+    about: "A later version of it won the company hackathon.",
     image: "/images/diddohub.png",
     link: "https://drive.google.com/file/d/1r6bT7cl8nPue7QGrfrikaNeD1JlhRLxw/view",
   },
   {
     name: "Chaos Shapes",
-    description: "chaotic but beautiful looking animated shapes",
-    about:
-      "made this by accident while trying to learn math functions, lots of people liked it on replit",
+    description: "Animated shapes, chaotic and somehow pretty.",
+    about: "Made by accident while learning maths functions.",
     image: "/images/randoms/randomph.png",
     link: "https://replit.com/@vishal1999tk/Random-Shapes-Generator?v=1",
   },
   {
     name: "Generative Scapes",
-    description: "minimal & beautiful mountain scapes with math",
-    about: "the beauty in simple math functions <3",
+    description: "Mountain scapes drawn from simple maths.",
+    about: "Proof that simple maths can be beautiful.",
     image: "/images/randoms/randomph.png",
     link: "https://replit.com/@vishal1999tk/Generative-Scapes?v=1",
   },

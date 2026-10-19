@@ -63,7 +63,7 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
             </h1>
           </ProjectTitle>
           <p className="mt-3 text-[1.125rem] text-pretty text-ink-2 md:text-[1.25rem]">
-            {project.description.replace(/\s*✨$/, "")}
+            {project.description}
           </p>
           <ul className="ui mt-6 flex flex-wrap gap-x-5 gap-y-2">
             {project.links.map((l) => (

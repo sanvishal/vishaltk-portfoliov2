@@ -472,8 +472,9 @@ export function PixelPlace() {
           disabled={busy}
           aria-label="Next place"
           title="Next place"
-          className="ml-auto text-ink-2 transition-[color,opacity] hover:text-ink disabled:opacity-40 disabled:hover:text-ink-2"
+          className="ml-auto flex items-center gap-1.5 text-ink-2 transition-[color,opacity] hover:text-ink disabled:opacity-40 disabled:hover:text-ink-2"
         >
+          Next
           <SkipForward aria-hidden className="size-4" />
         </button>
       </figcaption>

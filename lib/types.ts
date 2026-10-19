@@ -29,9 +29,11 @@ export type Project = {
 
 export type RandomProject = {
   name: string;
-  image: string;
+  /** a finished sentence or two */
   description: string;
   about: string;
+  image?: string;
+  /** a path on this site, or a full url that opens elsewhere */
   link: string;
 };
 
