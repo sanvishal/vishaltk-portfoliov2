@@ -90,6 +90,8 @@ const treat = (c1: string, c2: string, c3: string) => {
 const size = () => (chance(0.38) ? rand(1.2, 1.95) : chance(0.12) ? rand(0.6, 0.85) : 1);
 
 const BURST = 2000;
+// uneven frames, mostly on twos, sometimes threes, now and then a quick one
+const FRAMES = [83, 83, 83, 125, 125, 42, 62];
 
 /**
  * a few words that every so often glitch the way the titles do in the spider-verse films. for
@@ -97,8 +99,9 @@ const BURST = 2000;
  * looks, warps, treatments, typefaces, sizes, colours, case and angle, holding some frames for
  * two or three beats and snapping back to itself for one now and then, and once in a while the
  * whole lot cuts to the same look together. the frames come at an uneven, stop-motion rate.
- * letters start in a ripple from a random one and settle at their own times, then all of it
- * sits still for a few seconds. hovering sets it off too. with reduced motion it stays put.
+ * letters start in a ripple from a random one and settle at their own times. in between, a
+ * letter or two flickers on its own now and then, and the pointer sets off the letter under
+ * it and a few around it. with reduced motion it stays put.
  *
  * none of it touches the layout: each letter's own glyph stays in the line, just turned
  * invisible, and the glitch is drawn in a layer laid over it.
@@ -162,9 +165,41 @@ export function Verse({ children }: { children: string }) {
       m.filter = treat(a.c, b.c, c.c);
     };
 
+    // a single letter glitching on its own for a moment
+    const flick = letters.map(() => 0);
+    const flicker = (k: number, ms: number) => {
+      if (running) return;
+      clearTimeout(flick[k]);
+      const end = performance.now() + ms;
+      const tick = () => {
+        if (running) return;
+        if (performance.now() >= end) return rest(k);
+        if (!letters[k].dataset.s || !chance(0.3)) look(k, pickState());
+        flick[k] = window.setTimeout(tick, pick(FRAMES));
+      };
+      tick();
+    };
+
+    // the letter under the pointer, and a few either side of it, fewer the further out
+    const onEnter = (e: PointerEvent) => {
+      const at = letters.indexOf(e.currentTarget as HTMLElement);
+      flicker(at, rand(350, 700));
+      for (let d = 1; d <= 3; d++) {
+        for (const k of [at - d, at + d]) {
+          if (k < 0 || k >= letters.length || !chance(0.85 - d * 0.22)) continue;
+          clearTimeout(flick[k]);
+          flick[k] = window.setTimeout(() => flicker(k, rand(150, 500)), d * rand(25, 70));
+        }
+      }
+    };
+
     const burst = () => {
       if (running) return;
       running = true;
+      flick.forEach((t, k) => {
+        clearTimeout(t);
+        rest(k);
+      });
       // a ripple out from a random letter, roughed up; each settles on its own
       const origin = Math.floor(Math.random() * letters.length);
       const step = rand(15, 50);
@@ -188,8 +223,7 @@ export function Verse({ children }: { children: string }) {
           look(k, together ?? pickState());
         });
         if (t < BURST) {
-          // uneven frames, mostly on twos, sometimes threes, now and then a quick one
-          frame = window.setTimeout(tick, pick([83, 83, 83, 125, 125, 42, 62]));
+          frame = window.setTimeout(tick, pick(FRAMES));
         } else {
           letters.forEach((_, k) => rest(k));
           delete el.dataset.glitch;
@@ -202,25 +236,41 @@ export function Verse({ children }: { children: string }) {
     const loop = (delay: number) => {
       wait = window.setTimeout(() => {
         if (visible && !document.hidden) burst();
-        loop(rand(4000, 6800));
+        loop(rand(6000, 9000));
       }, delay);
     };
     loop(1300);
 
+    // between bursts, a stray letter or two
+    let stray = 0;
+    const idle = (delay: number) => {
+      stray = window.setTimeout(() => {
+        if (visible && !document.hidden) {
+          const k = Math.floor(Math.random() * letters.length);
+          flicker(k, rand(120, 450));
+          if (chance(0.3)) flicker(Math.floor(Math.random() * letters.length), rand(120, 350));
+        }
+        idle(rand(500, 2200));
+      }, delay);
+    };
+    idle(3200);
+
     const io = new IntersectionObserver(([e]) => (visible = e.isIntersecting));
     io.observe(el);
-    el.addEventListener("pointerenter", burst);
+    letters.forEach((l) => l.addEventListener("pointerenter", onEnter));
     return () => {
       clearTimeout(warm);
       clearTimeout(wait);
       clearTimeout(frame);
+      clearTimeout(stray);
+      flick.forEach(clearTimeout);
       io.disconnect();
-      el.removeEventListener("pointerenter", burst);
+      letters.forEach((l) => l.removeEventListener("pointerenter", onEnter));
     };
   }, []);
 
   return (
-    <span ref={ref} className={`verse ${verseFontVars}`}>
+    <span ref={ref} className={`verse cursor-default ${verseFontVars}`}>
       <span className="sr-only">{children}</span>
       <span aria-hidden>
         {[...children].map((ch, k) =>

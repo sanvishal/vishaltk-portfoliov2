@@ -28,11 +28,14 @@ export default function Home() {
           <Section label="About">
             <div className="max-w-[36rem] space-y-5 text-pretty md:text-[1.125rem] md:leading-[1.6]">
               <p>
-                I&rsquo;m a <Verse>design engineer</Verse> at <Brand name="pushowl" />, working on{" "}
-                <Brand name="shopify" /> apps used by millions of people. I design what I build, and most
-                of my time goes into how it moves and feels.
+                I&rsquo;m a <Verse>design engineer</Verse> at <Brand name="pushowl" />. Right now I&rsquo;m
+                building <Brand name="adstudio" />, automating ecommerce ads with agents that orchestrate
+                other agents.
               </p>
-              <p>Outside work I make and play games, and obsess over movies.</p>
+              <p>
+                I design what I build, then keep tweaking it until it feels right. Outside work I make and
+                play games, and obsess over movies.
+              </p>
             </div>
           </Section>
         </div>
